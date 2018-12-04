@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EmailingSystem.Service.Logger": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

@@ -1,0 +1,18 @@
+FROM microsoft/aspnetcore-build:2.0.5-2.1.4 AS build-env
+
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.Status
+
+COPY . .
+
+RUN dotnet restore ./EmailingSystem.Service.Status/EmailingSystem.Service.Status.csproj
+
+RUN dotnet build ./EmailingSystem.Service.Status/EmailingSystem.Service.Status.csproj
+
+COPY . ./
+RUN dotnet publish ./EmailingSystem.Service.Status/EmailingSystem.Service.Status.csproj -c Release -o out
+
+FROM microsoft/aspnetcore:2.0.5
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.Status
+EXPOSE 80
+COPY --from=build-env /EmailingSystem.Api/EmailingSystem.Service.Status/EmailingSystem.Service.Status/out/ .
+ENTRYPOINT ["dotnet", "EmailingSystem.Service.Status.dll"]

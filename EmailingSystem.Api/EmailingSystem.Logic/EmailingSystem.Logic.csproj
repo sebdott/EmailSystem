@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Managers\**" />
+    <Compile Remove="Rules\**" />
+    <EmbeddedResource Remove="Managers\**" />
+    <EmbeddedResource Remove="Rules\**" />
+    <None Remove="Managers\**" />
+    <None Remove="Rules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="0.11.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EmailingSystem.Common\EmailingSystem.Common.csproj" />
+  </ItemGroup>
+
+</Project>

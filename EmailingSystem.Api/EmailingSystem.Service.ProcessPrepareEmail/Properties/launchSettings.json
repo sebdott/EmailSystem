@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "EmailingSystem.Service.ProcessPrepareEmail": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    }
+  }
+}

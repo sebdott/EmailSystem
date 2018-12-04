@@ -1,0 +1,18 @@
+FROM microsoft/aspnetcore-build:2.0.5-2.1.4 AS build-env
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.Logger
+
+COPY . .
+
+RUN dotnet restore ./EmailingSystem.Service.Logger/EmailingSystem.Service.Logger.csproj
+
+RUN dotnet build ./EmailingSystem.Service.Logger/EmailingSystem.Service.Logger.csproj
+
+COPY . ./
+RUN dotnet publish ./EmailingSystem.Service.Logger/EmailingSystem.Service.Logger.csproj -c Release -o out
+
+FROM microsoft/aspnetcore:2.0.5
+ENV ASPNETCORE_ENVIRONMENT="Production"
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.Logger
+EXPOSE 80
+COPY --from=build-env /EmailingSystem.Api/EmailingSystem.Service.Logger/EmailingSystem.Service.Logger/out/ .
+ENTRYPOINT ["dotnet", "EmailingSystem.Service.Logger.dll"]

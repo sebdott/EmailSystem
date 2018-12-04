@@ -1,0 +1,128 @@
+version: '3'
+services:
+  portainer:
+    image: portainer/portainer 
+    ports:
+    - 9000:9000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./DockerConfig/volumes/portainer:/data   
+  mongodb:
+    image: mongo:latest
+    ports:
+      - 27017:27017
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:6.4.2
+    environment:
+      - cluster.name=graylog
+      - bootstrap.memory_lock=true
+    ports:
+      - 9200:9200
+      - 9300:9300
+  graylog:
+    image: graylog/graylog:2.4
+    environment:
+      GRAYLOG_PASSWORD_SECRET: somepasswordpepper
+      GRAYLOG_ROOT_PASSWORD_SHA2: 8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      GRAYLOG_WEB_ENDPOINT_URI: http://localhost:9038/api
+      GRAYLOG_ELASTICSEARCH_HOSTS: http://elasticsearch:9200/
+    links:
+      - mongodb:mongo
+      - elasticsearch:elasticsearch
+    ports:
+      - 9038:9000
+      - 12201:12201/udp
+      - 12202:12202/udp
+      - 1514:1514/udp
+    volumes:
+      - ./DockerConfig/Graylog/content_pack.json:/usr/share/graylog/data/contentpacks/content_pack.json
+  zookeeper:
+    image: confluentinc/cp-zookeeper:4.0.0
+    hostname: zookeeper
+    ports:
+      - '32182:32181'
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 32181
+      JMX_PORT: 9998
+  kafka:
+    image: confluentinc/cp-kafka:4.0.0
+    depends_on:
+      - zookeeper
+    hostname: kafka
+    ports:
+      - '9092:9092'
+      - '29092:29092'
+    environment:
+      KAFKA_BROKER_ID: 2
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:32181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_NUM_PARTITIONS: 2
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      JMX_PORT: 9997
+
+  emailingsystem.api:
+    image: emailingsystem.api
+    depends_on:
+      - kafka
+    build:
+      context: ./EmailingSystem.Api
+      dockerfile: Dockerfile.Api
+    ports:
+      - '801:80'
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  emailingsystem.service.logger:
+    image: emailingsystem.service.logger
+    depends_on:
+      - kafka
+    build:
+      context: ./EmailingSystem.Api
+      dockerfile: Dockerfile.Service.Logger
+    environment:
+      ASPNETCORE_ENVIRONMENT: 'Production'
+
+  emailingsystem.service.status:
+    image: emailingsystem.service.status
+    depends_on:
+      - kafka
+    build:
+      context: ./EmailingSystem.Api
+      dockerfile: Dockerfile.Service.Status
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  emailingsystem.service.sendemail:
+    image: emailingsystem.service.sendemail
+    depends_on:
+      - kafka
+    build:
+      context: ./EmailingSystem.Api
+      dockerfile: Dockerfile.Service.SendEmail
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  emailingsystem.service.processprepareemail:
+    image: emailingsystem.service.processprepareemail
+    depends_on:
+      - kafka
+    build:
+      context: ./EmailingSystem.Api
+      dockerfile: Dockerfile.Service.ProcessPrepareEmail
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+
+  emailingsystem.ui:
+    container_name: emailingsystem-ui
+    depends_on:
+      - emailingsystem.api
+    volumes:
+      - .:/app
+      - /app/node_modules
+    build:
+      context: ./EmailingSystem.UI
+      dockerfile: Dockerfile
+    ports:
+      - '802:80'

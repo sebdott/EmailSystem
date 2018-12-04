@@ -1,0 +1,18 @@
+FROM microsoft/aspnetcore-build:2.0.5-2.1.4 AS build-env
+
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.SendEmail
+
+COPY . .
+
+RUN dotnet restore ./EmailingSystem.Service.SendEmail/EmailingSystem.Service.SendEmail.csproj
+
+RUN dotnet build ./EmailingSystem.Service.SendEmail/EmailingSystem.Service.SendEmail.csproj
+
+COPY . ./
+RUN dotnet publish ./EmailingSystem.Service.SendEmail/EmailingSystem.Service.SendEmail.csproj -c Release -o out
+
+FROM microsoft/aspnetcore:2.0.5
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.SendEmail
+EXPOSE 80
+COPY --from=build-env /EmailingSystem.Api/EmailingSystem.Service.SendEmail/EmailingSystem.Service.SendEmail/out/ .
+ENTRYPOINT ["dotnet", "EmailingSystem.Service.SendEmail.dll"]

@@ -1,0 +1,18 @@
+FROM microsoft/aspnetcore-build:2.0.5-2.1.4 AS build-env
+
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.ProcessPrepareEmail
+
+COPY . .
+
+RUN dotnet restore ./EmailingSystem.Service.ProcessPrepareEmail/EmailingSystem.Service.ProcessPrepareEmail.csproj
+
+RUN dotnet build ./EmailingSystem.Service.ProcessPrepareEmail/EmailingSystem.Service.ProcessPrepareEmail.csproj
+
+COPY . ./
+RUN dotnet publish ./EmailingSystem.Service.ProcessPrepareEmail/EmailingSystem.Service.ProcessPrepareEmail.csproj -c Release -o out
+
+FROM microsoft/aspnetcore:2.0.5
+WORKDIR /EmailingSystem.Api/EmailingSystem.Service.ProcessPrepareEmail
+EXPOSE 80
+COPY --from=build-env /EmailingSystem.Api/EmailingSystem.Service.ProcessPrepareEmail/EmailingSystem.Service.ProcessPrepareEmail/out/ .
+ENTRYPOINT ["dotnet", "EmailingSystem.Service.ProcessPrepareEmail.dll"]
