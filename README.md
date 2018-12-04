@@ -57,10 +57,10 @@ Find the line -p <public port>:<private port> and do the necessary modifications
 **Application Screenshots:-**
 
 **Front End UI :** 
-![alt text](https://raw.githubusercontent.com/codedsphere/EmailingSystem/master/Images/FrontUI.JPG)
+![alt text](https://raw.githubusercontent.com/codedsphere/EmailSystem/master/Images/FrontUI.JPG)
 
 **Back End Api Swagger:** 
-![alt text](https://raw.githubusercontent.com/codedsphere/EmailingSystem/master/Images/BackEnd.JPG)
+![alt text](https://raw.githubusercontent.com/codedsphere/EmailSystem/master/Images/BackEnd.JPG)
 
 **GrayLog : Log Management :**  
 ```
