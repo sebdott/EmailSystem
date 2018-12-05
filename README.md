@@ -18,7 +18,7 @@ This is the list of technologies used :-
 
 
 This is a rough idea of the process of this system.
-![alt text](https://raw.githubusercontent.com/codedsphere/EmailingSystem/master/Images/SystemFlow.jpg)
+![alt text](https://raw.githubusercontent.com/codedsphere/EmailSystem/master/Images/SystemFlow.jpg)
 
 **Tools Used:-**
 - Visual Studio 2017
